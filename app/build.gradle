@@ -62,7 +62,11 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
 
     // Es neceario agregar estas dependencias
-    implementation "androidx.camera:camera-core:1.1.0-alpha06"
-    implementation "androidx.camera:camera-camera2:1.1.0-alpha06"
+    implementation "androidx.camera:camera-core:1.2.1"
+    implementation "androidx.camera:camera-camera2:1.2.1"
+    implementation "androidx.camera:camera-lifecycle:1.2.1"
+    implementation "androidx.camera:camera-view:1.2.1"
+    implementation "io.coil-kt:coil-compose:1.4.0"
+
 
 }
