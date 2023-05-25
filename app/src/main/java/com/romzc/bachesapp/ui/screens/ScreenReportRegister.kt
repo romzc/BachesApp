@@ -13,10 +13,12 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Lifecycle
@@ -25,6 +27,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import com.romzc.bachesapp.MainActivity
+import com.romzc.bachesapp.navigation.Routes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
@@ -60,6 +63,7 @@ fun ScreenReportRegister(
     val isCameraPermissionGranted = remember { mutableStateOf(isCameraGranted) }
     val capturedImage = remember { mutableStateOf<Bitmap?>(null) }
     val imageUri = remember { mutableStateOf("") }
+    val showError = remember { mutableStateOf(false) }
 
     CustomNavBar(navController = navController, title = "Registrar Bache")
 
@@ -102,32 +106,47 @@ fun ScreenReportRegister(
             onValueChange = { description.value = it }
         )
 
+        if (showError.value) {
+            Text(
+                text = "Por favor, complete los campos",
+                textAlign = TextAlign.Center,
+                color = Color.Red,
+                modifier = Modifier.padding(vertical = 4.dp)
+            )
+        }
+
         Row( Modifier.padding(top = 10.dp)) {
             CommonButton(text = "Guardar", onClick = {
+                val bitmapAux = capturedImage.value
+                if(validateForm(title.value, description.value, bitmapAux)) {
+                    // Ojo Corregir.
+                    if (bitmapAux != null) {
+                        storeBitMap(
+                            bitmapAux,
+                            context,
+                            lifecycleOwner.lifecycleScope,
+                            imageUri
+                        )
+                    }
+                    Log.i("APP", "${title.value} ${description.value} ${imageUri.value}")
+                    navController.popBackStack()
 
-                // Ojo Corregir.
-                if (capturedImage.value != null) {
-                    storeBitMap(
-                        capturedImage.value!!,
-                        context, lifecycleOwner.lifecycleScope,
-                        imageUri
-                    )
-                }
+                } else showError.value = true
             })
             Spacer(modifier = Modifier.width(20.dp))
-            CommonButton(text = "Cancelar", onClick = {})
+            CommonButton(text = "Cancelar", onClick = { navController.popBackStack() })
         }
     }
 }
 
 fun storeBitMap(bitMap: Bitmap, context: Context, lifeCycleScope: LifecycleCoroutineScope, mutableState: MutableState<String>) {
-
     // Convertimos la imagen.
     val bitmapNative = bitMap.asImageBitmap().asAndroidBitmap()
 
     // Obtenemos la direccion URI de la imagen que deseamos almacenar
     val photoUri = createPhotoName()
     val file = File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), photoUri)
+    mutableState.value = file.absolutePath
     // Iniciamos una corrutna para almacenar el bitmap en segundo plano,
     lifeCycleScope.launch(Dispatchers.IO) {
         var outputStream: FileOutputStream? = null
@@ -136,8 +155,7 @@ fun storeBitMap(bitMap: Bitmap, context: Context, lifeCycleScope: LifecycleCorou
             // Comprime el bitmap en formato JPEG y escribe los datos en el archivo
             bitmapNative.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
             outputStream.flush()
-            mutableState.value = file.absolutePath
-            // Opcionalmente, puedes notificar a la galería de medios para que escanee el nuevo archivo
+            // Notificamos a la galería de media para que escanee el nuevo archivo
             MediaScannerConnection.scanFile(context, arrayOf(file.toString()), null, null)
         } catch (e: Exception) {
             // Manejar errores o excepciones aquí
@@ -146,6 +164,13 @@ fun storeBitMap(bitMap: Bitmap, context: Context, lifeCycleScope: LifecycleCorou
             outputStream?.close()
         }
     }
+}
+
+/**
+ * Retorna verdadero si los datos son correctos caso contrario false.
+ */
+fun validateForm(title: String, description: String, bitmap: Bitmap?): Boolean {
+    return title.isNotEmpty() && description.isNotEmpty() && bitmap != null
 }
 
 fun createPhotoName(): String {
