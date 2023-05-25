@@ -11,11 +11,17 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.romzc.bachesapp.data.User
-import com.romzc.bachesapp.ui.composables.BacheForm
+import com.romzc.bachesapp.navigation.Routes
+import com.romzc.bachesapp.ui.composables.ScreenReportRegister
+import com.romzc.bachesapp.ui.screens.ScreenReportList
+import com.romzc.bachesapp.ui.screens.ScreenUserLogin
+import com.romzc.bachesapp.ui.screens.ScreenUserRegister
 
 class MainActivity : ComponentActivity() {
-
 
     private var shouldShowCamera: MutableState<Boolean> = mutableStateOf(false)
 
@@ -25,13 +31,35 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requestCameraPermission()
+
         setContent {
-            BacheForm(
-                User(1, "Rony", "Ventura", "@", "password"),
-                saveData = { Log.i("APP", "Save information") },
-                isCameraGranted = shouldShowCamera.value
-            )
+
+            val navController = rememberNavController()
+
+            NavHost(
+                navController = navController,
+                startDestination = Routes.UserLogin.route
+            ) {
+               composable(Routes.ReportList.route) {
+                   ScreenReportList(navController = navController)
+               }
+                composable(Routes.ReportRegister.route) {
+                    ScreenReportRegister(
+                        navController = navController,
+                        userId = 1,
+                        saveData = { /*TODO*/ },
+                        isCameraGranted = shouldShowCamera.value
+                    )
+                }
+
+                composable(Routes.UserLogin.route) {
+                    ScreenUserLogin(naveController = navController)
+                }
+
+                composable(Routes.UserRegister.route) {
+                    ScreenUserRegister(naveController = navController)
+                }
+            }
         }
         requestCameraPermission()
     }

@@ -14,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
-import com.romzc.bachesapp.data.User
+import androidx.navigation.NavController
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -30,8 +30,9 @@ import java.util.*
  */
 
 @Composable
-fun BacheForm(
-    user: User,
+fun ScreenReportRegister(
+    navController: NavController,
+    userId: Int,
     saveData: () -> Unit,
     isCameraGranted: Boolean
 ) {
@@ -41,11 +42,14 @@ fun BacheForm(
     val isCameraPermissionGranted = remember { mutableStateOf(isCameraGranted) }
     val capturedImage = remember { mutableStateOf<Bitmap?>(null) }
 
+    CustomNavBar(navController = navController, title = "Registrar Bache")
 
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize().padding(10.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(10.dp)
     ) {
 
         ImageWithDefault(capturedImage.value, contentDescription = "Text" )

@@ -3,7 +3,7 @@ package com.romzc.bachesapp.data
 import java.sql.Date
 
 
-data class Bache(
+data class PotHole(
     val id:Int,
     val title: String,
     val description: String,
