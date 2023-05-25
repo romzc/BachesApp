@@ -10,15 +10,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.navigation.NavController
 import com.romzc.bachesapp.R
 import com.romzc.bachesapp.navigation.Routes
 import com.romzc.bachesapp.ui.composables.CustomNavBar
+import com.romzc.bachesapp.viewmodel.PotholeViewModel
+import com.romzc.bachesapp.viewmodel.UserViewModel
 
 @Composable
 fun ScreenReportList(navController: NavController){
+    /**************/
+    val mPotholeViewModel: PotholeViewModel = ViewModelProvider(LocalContext.current as ViewModelStoreOwner).get(PotholeViewModel::class.java)
 
     CustomNavBar(navController = navController, title = "Reporte")
 

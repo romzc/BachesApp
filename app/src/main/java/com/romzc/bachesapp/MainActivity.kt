@@ -7,9 +7,8 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -17,6 +16,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -47,11 +47,13 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val navController = rememberNavController()
+            val dataStore = DataStoreClass(LocalContext.current)
+            val savedId = dataStore.getId.collectAsState(initial = -1)
 
             CompositionLocalProvider(LocalLifecycleOwner provides this) {
                 NavHost(
                     navController = navController,
-                    startDestination = Routes.UserLogin.route
+                    startDestination = determineStartDestination(savedId.value)
                 ) {
                     composable(Routes.ReportList.route) {
                         ScreenReportList(navController = navController)
@@ -79,6 +81,13 @@ class MainActivity : ComponentActivity() {
         requestStoragePermission()
     }
 
+    private fun determineStartDestination(savedId: Int?): String {
+        return if (savedId != -1) {
+            Routes.ReportList.route
+        } else {
+            Routes.UserLogin.route
+        }
+    }
 
     private fun requestCameraPermission() {
         when {

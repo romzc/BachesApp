@@ -21,13 +21,15 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleCoroutineScope
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
+import androidx.datastore.dataStore
+import androidx.lifecycle.*
 import androidx.navigation.NavController
+import com.romzc.bachesapp.DataStoreClass
 import com.romzc.bachesapp.MainActivity
+import com.romzc.bachesapp.data.entities.PotholeEntity
 import com.romzc.bachesapp.navigation.Routes
+import com.romzc.bachesapp.viewmodel.PotholeViewModel
+import com.romzc.bachesapp.viewmodel.UserViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
@@ -58,12 +60,17 @@ fun ScreenReportRegister(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
+    val dataStore = DataStoreClass(LocalContext.current)
+    val savedId = dataStore.getId.collectAsState(initial = -1)
+
     val title = remember { mutableStateOf("")}
     val description = remember { mutableStateOf("") }
     val isCameraPermissionGranted = remember { mutableStateOf(isCameraGranted) }
     val capturedImage = remember { mutableStateOf<Bitmap?>(null) }
     val imageUri = remember { mutableStateOf("") }
     val showError = remember { mutableStateOf(false) }
+
+    val mPotholeViewModel: PotholeViewModel = ViewModelProvider(LocalContext.current as ViewModelStoreOwner).get(PotholeViewModel::class.java)
 
     CustomNavBar(navController = navController, title = "Registrar Bache")
 
@@ -129,6 +136,13 @@ fun ScreenReportRegister(
                         )
                     }
                     Log.i("APP", "${title.value} ${description.value} ${imageUri.value}")
+                    val newPothole = PotholeEntity(
+                        potDesc = description.value,
+                        potImg = imageUri.value,
+                        potSev = 2,
+                        potUser = savedId.value!!
+                    )
+                    mPotholeViewModel.addPothole(newPothole)
                     navController.popBackStack()
 
                 } else showError.value = true

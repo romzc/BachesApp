@@ -3,6 +3,7 @@ package com.romzc.bachesapp.data.entities
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.text.SimpleDateFormat
 import java.util.*
 
 @Entity(tableName = "Pothole")
@@ -17,9 +18,12 @@ data class PotholeEntity(
     @ColumnInfo(name = "PotSev")
     val potSev: Int,
 
-    @ColumnInfo(name = "PotDat")
-    val potDate: Date,
-
     @ColumnInfo(name = "PotDes")
     val potDesc: String,
+
+    @ColumnInfo(name = "PotImg")
+    val potImg: String,
+
+    @ColumnInfo(name="PotDate")
+    val potDate: String = SimpleDateFormat("dd/MM/yyyy_HHmmss", Locale.getDefault()).format(Date())
 )

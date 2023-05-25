@@ -29,6 +29,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.romzc.bachesapp.DataStoreClass
 import com.romzc.bachesapp.R
 import com.romzc.bachesapp.navigation.Routes
 // import com.example.danp_examen.viewmodel.UserViewModel
@@ -45,6 +46,7 @@ fun ScreenUserLogin(naveController: NavController) {
     var passView by remember { mutableStateOf(false) }
     var showError by remember { mutableStateOf(false) }
 
+    val dataStore = DataStoreClass(LocalContext.current)
     val mUserViewModel: UserViewModel = ViewModelProvider(LocalContext.current as ViewModelStoreOwner).get(UserViewModel::class.java)
 
     Box(
@@ -167,8 +169,9 @@ fun ScreenUserLogin(naveController: NavController) {
                     mUserViewModel.viewModelScope.launch {
                         val credentialsValid = mUserViewModel.checkUser(email, password)
                         if (credentialsValid) {
-                            val id = mUserViewModel.getUserId(email, password)
+                            val id = mUserViewModel.getUserId(email, password)?: -1
                             naveController.navigate(Routes.ReportList.route)
+                            dataStore.saveId(id)
                         } else{
                             showError = true
                         }
@@ -209,7 +212,6 @@ fun ScreenUserLogin(naveController: NavController) {
             }
 
         }
-
 
 
         Column(

@@ -7,6 +7,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import com.romzc.bachesapp.data.entities.UserEntity
+import com.romzc.bachesapp.data.entities.UserWithPotholes
 
 
 @Dao
@@ -27,9 +28,8 @@ interface UserDao {
     @Insert
     suspend fun addUser(userEntity: UserEntity)
 
-    /*
+
     @Transaction
     @Query("SELECT * FROM User WHERE UseId = :userId")
-    suspend fun getUserWithStudents(userId: Int): List<UserWithPotholes>
-    */
+    suspend fun getUserWithPotholes(userId: Int): List<UserWithPotholes>
 }
